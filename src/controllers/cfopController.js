@@ -1,18 +1,22 @@
-const cfopData = require("../data/cfopsData.json"); // Certifique-se que esse arquivo existe
+const Cfop = require("../models/Cfop");
 
-const getAllCfops = (req, res) => {
-    res.json(cfopData);
+const getAllCfops = async (req, res) => {
+    try {
+        const cfops = await Cfop.find();
+        res.json(cfops);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar CFOPs" });
+    }
 };
 
-const getCfopByCode = (req, res) => {
-    const { codigo } = req.params;
-    const cfop = cfopData.find((item) => item.codigo === codigo);
-
-    if (!cfop) {
-        return res.status(404).json({ error: "Código CFOP não encontrado" });
+const getCfopByCode = async (req, res) => {
+    try {
+        const cfop = await Cfop.findOne({ codigo: req.params.codigo });
+        if (!cfop) return res.status(404).json({ error: "Código CFOP não encontrado" });
+        res.json(cfop);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar CFOP" });
     }
-
-    res.json(cfop);
 };
 
 module.exports = { getAllCfops, getCfopByCode };

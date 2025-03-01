@@ -1,26 +1,22 @@
-const csosnData = require("../data/csosnData.json");
+const Csosn = require("../models/Csosn");
 
-// Retorna todos os códigos CSOSN
-const getAllCsosn = (req, res) => {
-    if (!csosnData || csosnData.length === 0) {
-        return res.status(404).json({ error: "Nenhum código CSOSN encontrado" });
+const getAllCsosn = async (req, res) => {
+    try {
+        const csosns = await Csosn.find();
+        res.json(csosns);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar CSOSNs" });
     }
-    res.json(csosnData);
 };
 
-// Retorna um CSOSN específico pelo código
-const getCsosnByCode = (req, res) => {
-    const { codigo } = req.params;
-    const csosn = csosnData.find(item => item.codigo === codigo);
-
-    if (!csosn) {
-        return res.status(404).json({ error: "Código CSOSN não encontrado" });
+const getCsosnByCode = async (req, res) => {
+    try {
+        const csosn = await Csosn.findOne({ codigo: req.params.codigo });
+        if (!csosn) return res.status(404).json({ error: "Código CSOSN não encontrado" });
+        res.json(csosn);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar CSOSN" });
     }
-
-    res.json(csosn);
 };
 
-module.exports = {
-    getAllCsosn,
-    getCsosnByCode
-};
+module.exports = { getAllCsosn, getCsosnByCode };
