@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta CFOP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #313136, #000000);
+            color: #fff;
+            text-align: center;
+        }
+        header {
+            width: 100%;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+            background: transparent;
+        }
+        header nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+        header nav a:hover {
+            color: #e94560;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 60px;
+        }
+        .container {
+            background: rgba(230, 227, 227, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            color: #fff;
+            width: 90%;
+            max-width: 500px;
+            margin-top: 100px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #fff;
+            color: #000;
+        }
+        .btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #e94560;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            width: 100%;
+            max-width: 300px;
+        }
+        .btn:hover {
+            background: #d63049;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #17191d;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+            margin-top: auto;
+            position: absolute;
+            bottom: 0;
+        }
+        #resultado {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <nav>
+            <a href="/pages/sobre.html">Sobre</a>
+            <a href="/pages/telaEmDesenvolvimento.html">Contato</a>
+            <a href="/pages/telaEmDesenvolvimento.html">Contribua</a>
+        </nav>
+    </header>
+
+    <!-- Tela de consulta -->
+    <div class="title"><h3>Consulta CFOP</h3></div>
+    <br>
+    <div class="container">
+        <h2>Consulta CFOP</h2>
+        <p>Digite o código CFOP para realizar a consulta:</p>
+
+        <!-- Campo de entrada do CFOP -->
+        <input type="text" id="cfop" placeholder="Digite o código CFOP" required>
+
+        <!-- Área onde o resultado será exibido -->
+        <div id="resultado"></div>
+
+        <!-- Botão de consulta -->
+        <button type="button" class="btn" onclick="consultarCFOP()">Consultar</button>
+
+        <a href="/pages/main.html" class="btn">Voltar à Página Inicial</a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Gabriel Cardoso Fernandes. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function consultarCFOP() {
+            const cfop = document.getElementById('cfop').value;
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = '';
+
+            if (cfop === '') {
+                resultadoDiv.innerHTML = '<p>Digite um código CFOP para consulta.</p>';
+                return;
+            }
+
+            const url = `https://apiconsultadados.onrender.com/api/cfop/${cfop}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Código CFOP não encontrado.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Certifique-se de que os campos correspondem aos da API
+                    resultadoDiv.innerHTML = `
+                        <p><strong>CFOP:</strong> ${data.A || data.codigo || 'N/A'}</p>
+                        <p><strong>Descrição:</strong> ${data.B || data.descricao || 'N/A'}</p>
+                        <p><strong>Tipo:</strong> ${data.C || data.tipo || 'N/A'}</p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar os dados:', error);
+                    resultadoDiv.innerHTML = '<p>Erro ao carregar dados. Tente novamente mais tarde.</p>';
+                });
+        }
+
+        document.getElementById('cfop').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                consultarCFOP();
+            }
+        });
+    </script>
+</body>
+</html>
